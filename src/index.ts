@@ -1,8 +1,8 @@
 import {html, LitElement} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {customElement} from 'lit/decorators.js';
 
 import {styles} from './styles.js';
-import {FinalFormController} from './final-form-controller.js';
+import {TanstackFormController} from './tanstack-form-controller.ts';
 
 import '@material/web/textfield/filled-text-field.js';
 import '@material/web/checkbox/checkbox.js';
@@ -35,10 +35,10 @@ const formConfig: FormOptions<Employee, any> = {
 export class FinalFormDemo extends LitElement {
     static styles = styles;
 
-    #controller = new FinalFormController(this, formConfig);
+    #controller = new TanstackFormController(this, formConfig);
 
     render() {
-        const {form, register, array, getValue, update} = this.#controller;
+        const {form, register} = this.#controller;
 
 
         return html`
@@ -51,11 +51,7 @@ export class FinalFormDemo extends LitElement {
             >
                 <h1>🏁 Tanstack Form - Lit Demo</h1>
                 
-                <p>
-                    Uses record level validation. Errors don't show up until a field is
-                    "touched" or a submit is attempted. Errors disappear immediately as
-                    the user types.
-                </p>
+              
                <div>
                                     <label>First Name</label>
                                     <md-filled-text-field

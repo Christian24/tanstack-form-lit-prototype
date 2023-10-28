@@ -1,23 +1,20 @@
 import {html, noChange, nothing, ReactiveController, ReactiveControllerHost, TemplateResult,} from 'lit';
 import {Directive, directive, ElementPart, PartInfo, PartType,} from 'lit/directive.js';
 import {DeepKeys, DeepValue, FieldApi, FieldApiOptions, FieldOptions, FormApi, FormOptions} from '@tanstack/form-core'
-import {
-    FieldConfig, FieldState,
-} from 'final-form';
 import {ControlValueAccessor, getMWCAccessor} from "./control-value-accessor.ts";
 
 
-type ArrayRenderItemCallback<T> = (item: T, register: (name: string) => TemplateResult, getFieldState: (fieldName: string) => FieldState<any> | undefined, index: number) => TemplateResult;
+type ArrayRenderItemCallback<T> = (item: T, register: (name: string) => TemplateResult, index: number) => TemplateResult;
 
 
-export class FinalFormController<FormValues, Validator> implements ReactiveController {
+export class TanstackFormController<FormValues, Validator> implements ReactiveController {
     
     #host: ReactiveControllerHost;
     #subscription?: () => void;
 
     form: FormApi<FormValues, Validator>;
 
-    // https://final-form.org/docs/final-form/types/Config
+
     constructor(
         host: ReactiveControllerHost,
         config: FormOptions<FormValues, Validator>
@@ -40,16 +37,16 @@ export class FinalFormController<FormValues, Validator> implements ReactiveContr
         this.#subscription?.();
     }
 
-    // https://final-form.org/docs/final-form/types/FieldConfig
+
     register = <K extends DeepKeys<FormValues>>(
         name: K,
         fieldConfig?: Omit<FieldApiOptions<FormValues, K, any, Validator>, 'name' | 'form'>
     ) => {
-        return registerDirective(this.form as any,getMWCAccessor, String(name), fieldConfig);
+        return registerDirective(this.form as any,getMWCAccessor, String(name), fieldConfig as any);
     };
 
-    array = <K extends keyof FormValues>(name: K, cb: ArrayRenderItemCallback<unknown>, _fieldConfig?: FieldConfig<any>) => {
-        return renderArrayDirective(this.form as any, String(name), cb, _fieldConfig)
+    array = <K extends keyof FormValues>(name: K, cb: ArrayRenderItemCallback<unknown>, fieldConfig?: Omit<FieldApiOptions<FormValues, K, any, Validator>, 'name' | 'form'>) => {
+        return renderArrayDirective(this.form as any, String(name), cb, fieldConfig as any)
     }
     update = <K extends DeepKeys<FormValues>>(name: K, newValue: DeepValue<FormValues, K>) => {
         this.form.setFieldValue(name, newValue);
@@ -201,12 +198,9 @@ class RenderArrayDirective<FormValues, Validator> extends Directive {
                 const name = `${arrayName}.${elementName}`;
                 return registerDirective(_form, name, _fieldConfig);
             }
-            const getFieldState = (elementName: string) => {
-                const name = `${arrayName}.${elementName}`;
-                return _form.getFieldState(name);
-            }
            
-            return cb(item, register as any, getFieldState, index);
+           
+            return cb(item, register as any, index);
         })}`;
     }
 }
