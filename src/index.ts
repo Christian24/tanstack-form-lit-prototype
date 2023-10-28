@@ -21,7 +21,7 @@ interface Employee {
     employed: boolean;
 }
 
-// https://final-form.org/docs/final-form/types/Config
+
 const formConfig: FormOptions<Employee, any> = {
     onSubmit: async (values) => {
         await new Promise((r) => setTimeout(r, 500));
