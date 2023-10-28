@@ -2,7 +2,7 @@ import {html, LitElement} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
 
 import {styles} from './styles.js';
-import {FinalFormController, Config} from './final-form-controller.js';
+import {FinalFormController} from './final-form-controller.js';
 
 import '@material/web/textfield/filled-text-field.js';
 import '@material/web/checkbox/checkbox.js';
@@ -19,10 +19,6 @@ interface Employee {
     lastName: string;
     color: '#FF0000' | '#00FF00' | '#0000FF';
     employed: boolean;
-}
-
-interface FormValues {
-    employees: Employee[];
 }
 
 // https://final-form.org/docs/final-form/types/Config
@@ -65,7 +61,7 @@ export class FinalFormDemo extends LitElement {
                                     <md-filled-text-field
                                             type="text"
                                             placeholder="First Name"
-                                            ${register('firstName')}
+                                            ${register('firstName', {onChange: (name: string) => name.length < 3 ? 'Not long enough' : undefined})}
 
                                     ></md-filled-text-field>
                                 </div>

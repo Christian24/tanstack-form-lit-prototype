@@ -31,6 +31,7 @@ const checkboxValueAccessor: ControlValueAccessor<MdCheckbox, boolean> = {
     },
     setCustomValidity(element: MdCheckbox, message: string) {
         element.setCustomValidity(message);
+
     },
     eventName:  'input'
 }
@@ -46,7 +47,9 @@ const textFieldValueAccessor: ControlValueAccessor<MdFilledTextField | MdOutline
         element.value = value;
     },
     setCustomValidity(element: MdFilledTextField | MdOutlinedTextField, message: string) {
-        element.setCustomValidity(message);
+
+        element.errorText = message;
+        element.error = message.length > 0;
     },
     eventName:  'input'
 }
@@ -65,7 +68,8 @@ const selectValueAccessor: ControlValueAccessor<MdFilledSelect | MdOutlinedSelec
         return element.value;
     },
     setCustomValidity(element: MdFilledSelect | MdOutlinedSelect, message: string) {
-        element.setCustomValidity(message);
+        element.errorText = message;
+        element.error = message.length > 0;
     },
     eventName:  'input'
 }

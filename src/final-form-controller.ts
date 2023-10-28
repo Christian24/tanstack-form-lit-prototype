@@ -1,6 +1,6 @@
 import {html, noChange, nothing, ReactiveController, ReactiveControllerHost, TemplateResult,} from 'lit';
 import {Directive, directive, ElementPart, PartInfo, PartType,} from 'lit/directive.js';
-import {DeepKeys, DeepValue, FieldApi, FieldOptions, FormApi, FormOptions} from '@tanstack/form-core'
+import {DeepKeys, DeepValue, FieldApi, FieldApiOptions, FieldOptions, FormApi, FormOptions} from '@tanstack/form-core'
 import {
     FieldConfig, FieldState,
 } from 'final-form';
@@ -11,6 +11,7 @@ type ArrayRenderItemCallback<T> = (item: T, register: (name: string) => Template
 
 
 export class FinalFormController<FormValues, Validator> implements ReactiveController {
+    
     #host: ReactiveControllerHost;
     #subscription?: () => void;
 
@@ -42,7 +43,7 @@ export class FinalFormController<FormValues, Validator> implements ReactiveContr
     // https://final-form.org/docs/final-form/types/FieldConfig
     register = <K extends DeepKeys<FormValues>>(
         name: K,
-        fieldConfig?: FieldConfig<FormValues[K]>
+        fieldConfig?: Omit<FieldApiOptions<FormValues, K, any, Validator>, 'name' | 'form'>
     ) => {
         return registerDirective(this.form as any,getMWCAccessor, String(name), fieldConfig);
     };
@@ -82,7 +83,9 @@ class RegisterDirective<FormValues, Validator> extends Directive {
     ) {
         if (!this.#registered) {
             if (!this.#field) {
-                this.#field = new FieldApi({form, name});
+                const options = {...fieldConfig, name, form};
+
+                this.#field = new FieldApi(options);
             }
             const el = part.element as HTMLElement;
             this.#accessor = accessorFn(el);
@@ -98,12 +101,24 @@ class RegisterDirective<FormValues, Validator> extends Directive {
             this.#field?.store.subscribe(() => {
                 const value = this.#accessor.getValue(el);
                 const fieldValue = this.#field?.state.value as any;
+                const fieldMeta = form.getFieldMeta(name);  // this.#field?.state.meta.touchedErrors doesn't seem to have the same info
+
 
                 if (value !== fieldValue) {
                     if (!fieldValue) {
                         this.#accessor.setValue(el, this.#initialValue );
                     } else {
                         this.#accessor.setValue(el, fieldValue);
+                    }
+                }
+
+                // TODO Move this logic into the accessor
+                if (fieldMeta?.touchedErrors) {
+
+                    if (fieldMeta.touchedErrors.length > 0) {
+                        this.#accessor.setCustomValidity(el, String(fieldMeta.touchedErrors[0]))
+                    } else {
+                        this.#accessor.setCustomValidity(el,'');
                     }
                 }
             });
@@ -129,7 +144,7 @@ class RegisterDirective<FormValues, Validator> extends Directive {
         _form: FormApi<FormValues, Validator>,
         _accessorFn: (element: HTMLElement) => ControlValueAccessor<HTMLElement, any>,
         _name: DeepKeys<FormValues>,
-        _fieldConfig?: FieldOptions<any, any, any, any>
+        _fieldConfig?: Omit<FieldApiOptions<FormValues, DeepKeys<FormValues>, any, Validator>, 'name' | 'form'>
     ) {
         return nothing;
     }
@@ -177,7 +192,7 @@ class RenderArrayDirective<FormValues, Validator> extends Directive {
         _form: FormApi<FormValues, Validator>,
         _name: DeepKeys<FormValues>,
         cb: ArrayRenderItemCallback<T>,
-        _fieldConfig?: FieldConfig<any>
+        _fieldConfig?: Omit<FieldOptions<FormValues, DeepKeys<FormValues>, any, Validator>, 'name'>
     ) {
 
         return html`${this.#value.map((item: T, index: number) => {
