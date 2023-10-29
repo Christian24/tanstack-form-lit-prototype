@@ -92,7 +92,7 @@ export class FinalFormDemo extends LitElement {
             <label>Employed?</label>
             <md-checkbox
               @input="${() => field.handleChange(!field.getValue())}"
-              .value="${field.getValue()}"
+              .checked="${field.getValue()}"
               @blur="${() => field.handleBlur()}"
               .type=${"checkbox"}
             ></md-checkbox>
