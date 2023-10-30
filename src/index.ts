@@ -13,6 +13,7 @@ import "@material/web/button/outlined-button.js";
 import "@material/web/progress/circular-progress.js";
 import { FormOptions } from "@tanstack/form-core";
 import { bind } from "./bind.ts";
+import { repeat } from "lit/directives/repeat.js";
 
 interface Employee {
   firstName: string;
@@ -21,7 +22,11 @@ interface Employee {
   employed: boolean;
 }
 
-const formConfig: FormOptions<Employee, any> = {
+interface Data {
+  employees: Employee[];
+}
+
+const formConfig: FormOptions<Data, any> = {
   onSubmit: async (values) => {
     await new Promise((r) => setTimeout(r, 500));
     window.alert(JSON.stringify(values, null, 2));
@@ -43,60 +48,95 @@ export class FinalFormDemo extends LitElement {
         }}
       >
         <h1>🏁 Tanstack Form - Lit Demo</h1>
+        ${this.#form.field({ name: "employees", defaultValue: [] }, (field) => {
+          return html`${repeat(
+              field.getValue(),
+              (item, index) => index,
+              (item, index) => {
+                return html`
+                  ${this.#form.field(
+                    {
+                      name: `employees[${index}].firstName`,
+                      onChange: (name: string) =>
+                        name.length < 3 ? "Not long enough" : undefined,
+                    },
+                    (field) => {
+                      return html` <div>
+                        <label>First Name</label>
+                        <md-filled-text-field
+                          type="text"
+                          placeholder="First Name"
+                          ${bind(field)}
+                        ></md-filled-text-field>
+                      </div>`;
+                    },
+                  )}
+                  ${this.#form.field(
+                    { name: `employees[${index}].lastName` },
+                    (field) => {
+                      return html` <div>
+                        <label>Last Name</label>
+                        <md-filled-text-field
+                          type="text"
+                          placeholder="Last Name"
+                          ${bind(field)}
+                        ></md-filled-text-field>
+                      </div>`;
+                    },
+                  )}
+                  ${this.#form.field(
+                    { name: `employees[${index}].color` },
+                    (field) => {
+                      return html` <div>
+                        <label>Favorite Color</label>
+                        <md-filled-select ${bind(field)}>
+                          <md-select-option value="#FF0000">
+                            <div slot="headline">Red</div>
+                          </md-select-option>
+                          <md-select-option value="#00FF00">
+                            <div slot="headline">Green</div>
+                          </md-select-option>
+                          <md-select-option value="#0000FF">
+                            <div slot="headline">Blue</div>
+                          </md-select-option>
+                        </md-filled-select>
+                      </div>`;
+                    },
+                  )}
+                  ${this.#form.field(
+                    { name: `employees[${index}].employed` },
+                    (field) => {
+                      return html`<div>
+                        <label>Employed?</label>
+                        <md-checkbox
+                          @input="${() =>
+                            field.handleChange(!field.getValue())}"
+                          .checked="${field.getValue()}"
+                          @blur="${() => field.handleBlur()}"
+                          .type=${"checkbox"}
+                        ></md-checkbox>
+                      </div>`;
+                    },
+                  )}
+                `;
+              },
+            )}
 
-        ${this.#form.field(
-          {
-            name: "firstName",
-            onChange: (name: string) =>
-              name.length < 3 ? "Not long enough" : undefined,
-          },
-          (field) => {
-            return html` <div>
-              <label>First Name</label>
-              <md-filled-text-field
-                type="text"
-                placeholder="First Name"
-                ${bind(field)}
-              ></md-filled-text-field>
-            </div>`;
-          },
-        )}
-        ${this.#form.field({ name: "lastName" }, (field) => {
-          return html` <div>
-            <label>Last Name</label>
-            <md-filled-text-field
-              type="text"
-              placeholder="Last Name"
-              ${bind(field)}
-            ></md-filled-text-field>
-          </div>`;
-        })}
-        ${this.#form.field({ name: "color" }, (field) => {
-          return html` <div>
-            <label>Favorite Color</label>
-            <md-filled-select ${bind(field)}>
-              <md-select-option value="#FF0000">
-                <div slot="headline">Red</div>
-              </md-select-option>
-              <md-select-option value="#00FF00">
-                <div slot="headline">Green</div>
-              </md-select-option>
-              <md-select-option value="#0000FF">
-                <div slot="headline">Blue</div>
-              </md-select-option>
-            </md-filled-select>
-          </div>`;
-        })}
-        ${this.#form.field({ name: "employed" }, (field) => {
-          return html`<div>
-            <label>Employed?</label>
-            <md-checkbox
-              @input="${() => field.handleChange(!field.getValue())}"
-              .checked="${field.getValue()}"
-              @blur="${() => field.handleBlur()}"
-              .type=${"checkbox"}
-            ></md-checkbox>
-          </div>`;
+            <div>
+              <md-outlined-button
+                type="button"
+                @click=${() => {
+                  field.pushValue({
+                    firstName: "",
+                    lastName: "",
+                    employed: false,
+                    color: undefined,
+                  });
+                }}
+              >
+                Add employee
+              </md-outlined-button>
+            </div> `;
         })}
 
         <div>

@@ -63,21 +63,6 @@ export class TanstackFormController<FormValues, Validator>
     return fieldDirective(this.api as any, fieldConfig as any, render as any);
   };
 
-  array = <K extends keyof FormValues>(
-    name: K,
-    cb: ArrayRenderItemCallback<unknown>,
-    fieldConfig?: Omit<
-      FieldApiOptions<FormValues, K, any, Validator>,
-      "name" | "form"
-    >,
-  ) => {
-    return renderArrayDirective(
-      this.api as any,
-      String(name),
-      cb,
-      fieldConfig as any,
-    );
-  };
   update = <K extends DeepKeys<FormValues>>(
     name: K,
     newValue: DeepValue<FormValues, K>,
@@ -112,7 +97,7 @@ class FieldDirective<FormValues, Validator> extends Directive {
     if (!this.#registered) {
       if (!this.#field) {
         const options = { ...fieldConfig, form };
-
+        console.log("Create");
         this.#field = new FieldApi(options as any);
         this.#field.mount();
       }
