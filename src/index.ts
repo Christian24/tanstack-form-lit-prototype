@@ -56,7 +56,7 @@ export class TanstackFormDemo extends LitElement {
                 return html`
                   ${this.#form.field(
                     {
-                      name: `employees[${index}].firstName`,
+                      name: `employees.${index}.firstName`,
                       onChange: (name: string) =>
                         name.length < 3 ? "Not long enough" : undefined,
                     },
@@ -72,7 +72,7 @@ export class TanstackFormDemo extends LitElement {
                     },
                   )}
                   ${this.#form.field(
-                    { name: `employees[${index}].lastName` },
+                    { name: `employees.${index}.lastName` },
                     (field) => {
                       return html` <div>
                         <label>Last Name</label>
@@ -85,7 +85,7 @@ export class TanstackFormDemo extends LitElement {
                     },
                   )}
                   ${this.#form.field(
-                    { name: `employees[${index}].color` },
+                    { name: `employees.${index}.color` },
                     (field) => {
                       return html` <div>
                         <label>Favorite Color</label>
@@ -104,7 +104,7 @@ export class TanstackFormDemo extends LitElement {
                     },
                   )}
                   ${this.#form.field(
-                    { name: `employees[${index}].employed` },
+                    { name: `employees.${index}.employed` },
                     (field) => {
                       return html`<div>
                         <label>Employed?</label>
