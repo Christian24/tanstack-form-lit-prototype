@@ -74,7 +74,7 @@ class BindDirective extends AsyncDirective {
     if (this.#accessor == undefined) {
       return;
     }
-    console.log("Register");
+
     this.#subscription = field.store.subscribe(() => {
       if (this.#accessor == undefined) {
         return;
@@ -92,17 +92,10 @@ class BindDirective extends AsyncDirective {
         }
       }
 
-      // TODO Move this logic into the accessor
-      if (fieldMeta?.touchedErrors) {
-        if (fieldMeta.touchedErrors.length > 0) {
-          this.#accessor.setCustomValidity(
-            el,
-            String(fieldMeta.touchedErrors[0]),
-          );
-        } else {
-          this.#accessor.setCustomValidity(el, "");
-        }
-      }
+      this.#accessor.setCustomValidity?.(
+        el,
+        fieldMeta?.touchedErrors as string[],
+      );
     });
     this.#blurFn = () => {
       if (this.#field) {

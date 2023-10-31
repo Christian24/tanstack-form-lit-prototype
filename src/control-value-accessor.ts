@@ -14,7 +14,8 @@ export interface ControlValueAccessor<T extends HTMLElement, Value> {
   conforms(element: HTMLElement): boolean;
   getValue(element: T): Value;
   setValue(element: T, value: Value): void;
-  setCustomValidity(element: T, message: string): void;
+
+  setCustomValidity?(element: T, messages?: string[]): void;
   eventName: string;
 }
 
@@ -28,9 +29,7 @@ const checkboxValueAccessor: ControlValueAccessor<MdCheckbox, boolean> = {
   getValue(element: MdCheckbox): boolean {
     return element.checked;
   },
-  setCustomValidity(element: MdCheckbox, message: string) {
-    element.setCustomValidity(message);
-  },
+
   eventName: "input",
 };
 
@@ -52,10 +51,17 @@ const textFieldValueAccessor: ControlValueAccessor<
   },
   setCustomValidity(
     element: MdFilledTextField | MdOutlinedTextField,
-    message: string,
+    messages?: string[],
   ) {
-    element.errorText = message;
-    element.error = message.length > 0;
+    if (messages === undefined || messages.length === 0) {
+      element.error = false;
+      element.errorText = "";
+    }
+    const message = getFirstErrorMessage(messages);
+    if (message) {
+      element.errorText = message;
+      element.error = message.length > 0;
+    }
   },
   eventName: "input",
 };
@@ -80,10 +86,17 @@ const selectValueAccessor: ControlValueAccessor<
   },
   setCustomValidity(
     element: MdFilledSelect | MdOutlinedSelect,
-    message: string,
+    messages: string[],
   ) {
-    element.errorText = message;
-    element.error = message.length > 0;
+    if (messages === undefined || messages.length === 0) {
+      element.error = false;
+      element.errorText = "";
+    }
+    const message = getFirstErrorMessage(messages);
+    if (message) {
+      element.errorText = message;
+      element.error = message.length > 0;
+    }
   },
   eventName: "input",
 };
@@ -98,4 +111,8 @@ export function getMWCAccessor<T extends HTMLElement, Value = any>(
   }
 
   return textFieldValueAccessor as any;
+}
+
+function getFirstErrorMessage(messages: string[]) {
+  return messages.find((item) => item.length > 0);
 }
