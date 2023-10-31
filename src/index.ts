@@ -23,7 +23,7 @@ interface Employee {
 }
 
 interface Data {
-  employees: Employee[];
+  employees: Partial<Employee[]>;
 }
 
 const formConfig: FormOptions<Data, any> = {
