@@ -51,8 +51,8 @@ export class FinalFormDemo extends LitElement {
         ${this.#form.field({ name: "employees", defaultValue: [] }, (field) => {
           return html`${repeat(
               field.getValue(),
-              (item, index) => index,
-              (item, index) => {
+              (_, index) => index,
+              (_, index) => {
                 return html`
                   ${this.#form.field(
                     {
