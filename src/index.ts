@@ -33,8 +33,8 @@ const formConfig: FormOptions<Data, any> = {
   },
 };
 
-@customElement("final-form-demo")
-export class FinalFormDemo extends LitElement {
+@customElement("tanstack-form-demo")
+export class TanstackFormDemo extends LitElement {
   static styles = styles;
 
   #form = new TanstackFormController(this, formConfig);
@@ -130,7 +130,6 @@ export class FinalFormDemo extends LitElement {
                     firstName: "",
                     lastName: "",
                     employed: false,
-                    color: undefined,
                   });
                 }}
               >

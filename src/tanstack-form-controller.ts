@@ -77,7 +77,7 @@ export class TanstackFormController<FormValues, Validator>
         ValidatorType,
         Validator
       >
-    )(this.api, fieldConfig, render as any);
+    )(this.api, fieldConfig, render);
   };
 }
 
@@ -117,7 +117,6 @@ class FieldDirective<
     return this.render(form, fieldConfig, _render);
   }
 
-  // Can't get generics carried over from directive call
   render(
     _form: FormApi<FormValues, Validator>,
     _fieldConfig: FieldOptions<FormValues, Name, ValidatorType, Validator>,
