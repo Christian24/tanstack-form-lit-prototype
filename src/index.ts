@@ -47,7 +47,7 @@ export class TanstackFormDemo extends LitElement {
           e.preventDefault();
         }}
       >
-        <h1>🏁 Tanstack Form - Lit Demo</h1>
+        <h1>Tanstack Form - Lit Demo</h1>
         ${this.#form.field({ name: "employees", defaultValue: [] }, (field) => {
           return html`${repeat(
               field.getValue(),
