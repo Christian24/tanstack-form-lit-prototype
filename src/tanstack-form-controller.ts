@@ -1,11 +1,5 @@
 import { nothing, ReactiveController, ReactiveControllerHost } from "lit";
-import {
-  Directive,
-  directive,
-  ElementPart,
-  PartInfo,
-  PartType,
-} from "lit/directive.js";
+import { directive, ElementPart, PartInfo, PartType } from "lit/directive.js";
 import {
   DeepKeys,
   FieldApi,
@@ -13,6 +7,7 @@ import {
   FormApi,
   FormOptions,
 } from "@tanstack/form-core";
+import { AsyncDirective } from "lit/async-directive.js";
 
 type renderCallback<
   FormValues,
@@ -49,7 +44,7 @@ export class TanstackFormController<FormValues, Validator>
 
   constructor(
     host: ReactiveControllerHost,
-    config: FormOptions<FormValues, Validator>,
+    config?: FormOptions<FormValues, Validator>,
   ) {
     (this.#host = host).addController(this);
 
@@ -86,9 +81,10 @@ class FieldDirective<
   Name extends DeepKeys<FormValues>,
   ValidatorType,
   Validator,
-> extends Directive {
+> extends AsyncDirective {
   #registered = false;
   #field?: FieldApi<FormValues, Name, ValidatorType, Validator>;
+  #unmount?: () => void;
 
   constructor(partInfo: PartInfo) {
     super(partInfo);
@@ -108,13 +104,25 @@ class FieldDirective<
         const options = { ...fieldConfig, form };
 
         this.#field = new FieldApi(options);
-        this.#field.mount();
+        this.#unmount = this.#field.mount();
       }
 
       this.#registered = true;
     }
 
     return this.render(form, fieldConfig, _render);
+  }
+
+  protected disconnected() {
+    super.disconnected();
+    this.#unmount?.();
+  }
+
+  protected reconnected() {
+    super.reconnected();
+    if (this.#field) {
+      this.#unmount = this.#field.mount();
+    }
   }
 
   render(
