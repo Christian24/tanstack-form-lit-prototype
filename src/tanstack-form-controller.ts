@@ -6,6 +6,7 @@ import {
   FieldOptions,
   FormApi,
   FormOptions,
+  FormState,
 } from "@tanstack/form-core";
 import { AsyncDirective } from "lit/async-directive.js";
 
@@ -41,6 +42,7 @@ export class TanstackFormController<FormValues, Validator>
   #subscription?: () => void;
 
   api: FormApi<FormValues, Validator>;
+  state?: FormState<FormValues>;
 
   constructor(
     host: ReactiveControllerHost,
@@ -54,6 +56,7 @@ export class TanstackFormController<FormValues, Validator>
   hostConnected() {
     this.#subscription = this.api.store.subscribe(() => {
       this.#host.requestUpdate();
+      this.state = this.api.store.state;
     });
   }
 
@@ -115,6 +118,8 @@ class FieldDirective<
 
   protected disconnected() {
     super.disconnected();
+    console.log(this.#field?.options.preserveValue);
+    console.log(this.#unmount);
     this.#unmount?.();
   }
 

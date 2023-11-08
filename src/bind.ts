@@ -3,7 +3,7 @@ import { FieldApi } from "@tanstack/form-core";
 import {
   ControlValueAccessor,
   getMWCAccessor,
-} from "./control-value-accessor.ts";
+} from "./control-value-accessor.js";
 import { noChange, nothing } from "lit";
 import { AsyncDirective } from "lit/async-directive.js";
 class BindDirective extends AsyncDirective {
@@ -31,6 +31,11 @@ class BindDirective extends AsyncDirective {
     [fieldConfig, accessorFn]: Parameters<this["render"]>,
   ) {
     this.#element = part.element as HTMLElement;
+    if (this.#field !== fieldConfig) {
+      // Not the same field
+      this.#registered = false;
+      this.unsubscribe();
+    }
     this.#field = fieldConfig;
     if (!this.#registered) {
       if (accessorFn === undefined) {
@@ -50,6 +55,19 @@ class BindDirective extends AsyncDirective {
 
   protected disconnected() {
     super.disconnected();
+    this.unsubscribe();
+
+    console.log("Disconnected");
+  }
+
+  protected reconnected() {
+    super.reconnected();
+    if (this.#field && this.#element) {
+      this.subscribe(this.#field, this.#element);
+    }
+  }
+
+  private unsubscribe() {
     this.#subscription?.();
     if (this.#element) {
       if (this.#blurFn) {
@@ -62,10 +80,10 @@ class BindDirective extends AsyncDirective {
         );
       }
     }
-    console.log("Disconnected");
   }
 
   // Can't get generics carried over from directive call
+  // @ts-ignore
   render(field: FieldApi<any, any, any, any>, accessorFn = getMWCAccessor) {
     return nothing;
   }

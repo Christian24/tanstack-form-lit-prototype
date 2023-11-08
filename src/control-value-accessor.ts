@@ -57,7 +57,7 @@ const textFieldValueAccessor: ControlValueAccessor<
       element.error = false;
       element.errorText = "";
     }
-    const message = getFirstErrorMessage(messages);
+    const message = getFirstErrorMessage(messages!);
     if (message) {
       element.errorText = message;
       element.error = message.length > 0;
