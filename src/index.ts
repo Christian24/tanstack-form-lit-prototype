@@ -58,8 +58,14 @@ export class TanstackFormDemo extends LitElement {
                   ${this.#form.field(
                     {
                       name: `employees.${index}.firstName`,
-                      onChange: (name: string) =>
-                        name.length < 3 ? "Not long enough" : undefined,
+                      validators: {
+                        onChange: (name: string) => {
+                          console.log("Hello");
+                          return name.length < 3
+                            ? "Not long enough"
+                            : undefined;
+                        },
+                      },
                     },
                     (field) => {
                       return html` <div>
@@ -121,10 +127,13 @@ export class TanstackFormDemo extends LitElement {
                           ? this.#form.field(
                               {
                                 name: `employees.${index}.jobTitle`,
-                                onChange: (val: string) =>
-                                  val.length === 0
-                                    ? "Needs to have a job here"
-                                    : null,
+                                validators: {
+                                  onChange: (value: string) => {
+                                    return value.length === 0
+                                      ? "Needs to have a job here"
+                                      : null;
+                                  },
+                                },
                               },
                               (field) => {
                                 return html` <div>
