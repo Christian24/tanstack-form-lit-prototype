@@ -11,12 +11,7 @@ import "@material/web/select/select-option.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/button/outlined-button.js";
 import "@material/web/progress/circular-progress.js";
-import {
-  DeepValue,
-  FieldState,
-  FormOptions,
-  Validator,
-} from "@tanstack/form-core";
+import { FieldState, FormOptions } from "@tanstack/form-core";
 import { bind } from "./bind.js";
 import { repeat } from "lit/directives/repeat.js";
 
@@ -54,10 +49,7 @@ export class TanstackFormDemo extends LitElement {
         }}
       >
         <h1>Tanstack Form - Lit Demo</h1>
-        ${this.#form.field<
-          "employees",
-          Validator<DeepValue<Data, "employees">, unknown>
-        >(
+        ${this.#form.field(
           {
             name: "employees",
             defaultValue: [],

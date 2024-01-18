@@ -72,7 +72,7 @@ export class TanstackFormController<
     this.#subscription?.();
   }
 
-  field = <
+  field<
     Name extends DeepKeys<FormValues>,
     FieldValidator extends
       | Validator<DeepValue<FormValues, Name>, unknown>
@@ -80,7 +80,7 @@ export class TanstackFormController<
   >(
     fieldConfig: FieldOptions<FormValues, Name, FieldValidator, FormValidator>,
     render: renderCallback<FormValues, Name, FieldValidator, FormValidator>,
-  ) => {
+  ) {
     return (
       fieldDirective as unknown as fieldDirectiveType<
         FormValues,
@@ -89,7 +89,7 @@ export class TanstackFormController<
         FormValidator
       >
     )(this.api, fieldConfig, render);
-  };
+  }
 }
 
 class FieldDirective<
