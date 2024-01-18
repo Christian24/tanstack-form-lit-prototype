@@ -7,50 +7,58 @@ import {
   FormApi,
   FormOptions,
   FormState,
+  Validator,
+  DeepValue,
 } from "@tanstack/form-core";
 import { AsyncDirective } from "lit/async-directive.js";
 
 type renderCallback<
   FormValues,
   Name extends DeepKeys<FormValues>,
-  ValidatorType,
-  Validator,
+  FieldValidator extends
+    | Validator<DeepValue<FormValues, Name>, unknown>
+    | undefined,
+  FormValidator extends Validator<FormValues> | undefined,
 > = (
-  fieldOptions: FieldApi<FormValues, Name, ValidatorType, Validator>,
+  fieldOptions: FieldApi<FormValues, Name, FieldValidator, FormValidator>,
 ) => unknown;
 type fieldDirectiveType<
   FormValues,
   Name extends DeepKeys<FormValues>,
-  ValidatorType,
-  Validator,
+  FieldValidator extends
+    | Validator<DeepValue<FormValues, Name>, unknown>
+    | undefined,
+  FormValidator extends Validator<FormValues> | undefined,
 > = (
-  form: FormApi<FormValues, Validator>,
-  options: FieldOptions<FormValues, Name, ValidatorType, Validator>,
-  render: renderCallback<FormValues, Name, ValidatorType, Validator>,
+  form: FormApi<FormValues, FormValidator>,
+  options: FieldOptions<FormValues, Name, FieldValidator, FormValidator>,
+  render: renderCallback<FormValues, Name, FieldValidator, FormValidator>,
 ) => {
   values: {
-    form: FormApi<FormValues, Validator>;
-    options: FieldOptions<FormValues, Name, ValidatorType, Validator>;
-    render: renderCallback<FormValues, Name, ValidatorType, Validator>;
+    form: FormApi<FormValues, FormValidator>;
+    options: FieldOptions<FormValues, Name, FieldValidator, FormValidator>;
+    render: renderCallback<FormValues, Name, FieldValidator, FormValidator>;
   };
 };
 
-export class TanstackFormController<FormValues, Validator>
-  implements ReactiveController
+export class TanstackFormController<
+  FormValues,
+  FormValidator extends Validator<FormValues> | undefined = undefined,
+> implements ReactiveController
 {
   #host: ReactiveControllerHost;
   #subscription?: () => void;
 
-  api: FormApi<FormValues, Validator>;
+  api: FormApi<FormValues, FormValidator>;
   state?: FormState<FormValues>;
 
   constructor(
     host: ReactiveControllerHost,
-    config?: FormOptions<FormValues, Validator>,
+    config?: FormOptions<FormValues, FormValidator>,
   ) {
     (this.#host = host).addController(this);
 
-    this.api = new FormApi<FormValues, Validator>(config);
+    this.api = new FormApi<FormValues, FormValidator>(config);
   }
 
   hostConnected() {
@@ -64,16 +72,21 @@ export class TanstackFormController<FormValues, Validator>
     this.#subscription?.();
   }
 
-  field = <K extends DeepKeys<FormValues>, ValidatorType>(
-    fieldConfig: FieldOptions<FormValues, K, ValidatorType, Validator>,
-    render: renderCallback<FormValues, K, ValidatorType, Validator>,
+  field = <
+    Name extends DeepKeys<FormValues>,
+    FieldValidator extends
+      | Validator<DeepValue<FormValues, Name>, unknown>
+      | undefined,
+  >(
+    fieldConfig: FieldOptions<FormValues, Name, FieldValidator, FormValidator>,
+    render: renderCallback<FormValues, Name, FieldValidator, FormValidator>,
   ) => {
     return (
       fieldDirective as unknown as fieldDirectiveType<
         FormValues,
-        K,
-        ValidatorType,
-        Validator
+        Name,
+        FieldValidator,
+        FormValidator
       >
     )(this.api, fieldConfig, render);
   };
@@ -82,11 +95,13 @@ export class TanstackFormController<FormValues, Validator>
 class FieldDirective<
   FormValues,
   Name extends DeepKeys<FormValues>,
-  ValidatorType,
-  Validator,
+  FieldValidator extends
+    | Validator<DeepValue<FormValues, Name>, unknown>
+    | undefined = undefined,
+  FormValidator extends Validator<FormValues> | undefined = undefined,
 > extends AsyncDirective {
   #registered = false;
-  #field?: FieldApi<FormValues, Name, ValidatorType, Validator>;
+  #field?: FieldApi<FormValues, Name, FieldValidator, FormValidator>;
   #unmount?: () => void;
 
   constructor(partInfo: PartInfo) {
@@ -131,9 +146,14 @@ class FieldDirective<
   }
 
   render(
-    _form: FormApi<FormValues, Validator>,
-    _fieldConfig: FieldOptions<FormValues, Name, ValidatorType, Validator>,
-    _renderCallback: renderCallback<FormValues, Name, ValidatorType, Validator>,
+    _form: FormApi<FormValues, FormValidator>,
+    _fieldConfig: FieldOptions<FormValues, Name, FieldValidator, FormValidator>,
+    _renderCallback: renderCallback<
+      FormValues,
+      Name,
+      FieldValidator,
+      FormValidator
+    >,
   ) {
     if (this.#field) {
       return _renderCallback(this.#field);

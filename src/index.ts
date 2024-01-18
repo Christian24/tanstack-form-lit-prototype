@@ -11,7 +11,12 @@ import "@material/web/select/select-option.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/button/outlined-button.js";
 import "@material/web/progress/circular-progress.js";
-import { FormOptions } from "@tanstack/form-core";
+import {
+  DeepValue,
+  FieldState,
+  FormOptions,
+  Validator,
+} from "@tanstack/form-core";
 import { bind } from "./bind.js";
 import { repeat } from "lit/directives/repeat.js";
 
@@ -27,7 +32,7 @@ interface Data {
   employees: Partial<Employee>[];
 }
 
-const formConfig: FormOptions<Data, any> = {
+const formConfig: FormOptions<Data> = {
   onSubmit: async (values) => {
     await new Promise((r) => setTimeout(r, 500));
     window.alert(JSON.stringify(values, null, 2));
@@ -49,125 +54,133 @@ export class TanstackFormDemo extends LitElement {
         }}
       >
         <h1>Tanstack Form - Lit Demo</h1>
-        ${this.#form.field({ name: "employees", defaultValue: [] }, (field) => {
-          return html`${repeat(
-              field.getValue(),
-              (_, index) => index,
-              (_, index) => {
-                return html`
-                  ${this.#form.field(
-                    {
-                      name: `employees.${index}.firstName`,
-                      validators: {
-                        onChange: (name: string) => {
-                          console.log("Hello");
-                          return name.length < 3
-                            ? "Not long enough"
-                            : undefined;
+        ${this.#form.field<
+          "employees",
+          Validator<DeepValue<Data, "employees">, unknown>
+        >(
+          {
+            name: "employees",
+            defaultValue: [],
+          },
+          (field) => {
+            return html`${repeat(
+                field.getValue(),
+                (_, index) => index,
+                (_, index) => {
+                  return html`
+                    ${this.#form.field(
+                      {
+                        name: `employees.${index}.firstNames`,
+                        validators: {
+                          onChange: (state: FieldState<string>) => {
+                            return state.value.length < 3
+                              ? "Not long enough"
+                              : undefined;
+                          },
                         },
                       },
-                    },
-                    (field) => {
-                      return html` <div>
-                        <label>First Name</label>
-                        <md-filled-text-field
-                          type="text"
-                          placeholder="First Name"
-                          ${bind(field)}
-                        ></md-filled-text-field>
-                      </div>`;
-                    },
-                  )}
-                  ${this.#form.field(
-                    { name: `employees.${index}.lastName` },
-                    (field) => {
-                      return html` <div>
-                        <label>Last Name</label>
-                        <md-filled-text-field
-                          type="text"
-                          placeholder="Last Name"
-                          ${bind(field)}
-                        ></md-filled-text-field>
-                      </div>`;
-                    },
-                  )}
-                  ${this.#form.field(
-                    { name: `employees.${index}.color` },
-                    (field) => {
-                      return html` <div>
-                        <label>Favorite Color</label>
-                        <md-filled-select ${bind(field)}>
-                          <md-select-option value="#FF0000">
-                            <div slot="headline">Red</div>
-                          </md-select-option>
-                          <md-select-option value="#00FF00">
-                            <div slot="headline">Green</div>
-                          </md-select-option>
-                          <md-select-option value="#0000FF">
-                            <div slot="headline">Blue</div>
-                          </md-select-option>
-                        </md-filled-select>
-                      </div>`;
-                    },
-                  )}
-                  ${this.#form.field(
-                    { name: `employees.${index}.employed` },
-                    (field) => {
-                      return html`<div>
-                          <label>Employed?</label>
-                          <md-checkbox
-                            @input="${() =>
-                              field.handleChange(!field.getValue())}"
-                            .checked="${field.getValue()}"
-                            @blur="${() => field.handleBlur()}"
-                            .type=${"checkbox"}
-                          ></md-checkbox>
-                        </div>
-                        ${field.getValue()
-                          ? this.#form.field(
-                              {
-                                name: `employees.${index}.jobTitle`,
-                                validators: {
-                                  onChange: (value: string) => {
-                                    return value.length === 0
-                                      ? "Needs to have a job here"
-                                      : null;
+                      (field) => {
+                        return html` <div>
+                          <label>First Name</label>
+                          <md-filled-text-field
+                            type="text"
+                            placeholder="First Name"
+                            ${bind(field)}
+                          ></md-filled-text-field>
+                        </div>`;
+                      },
+                    )}
+                    ${this.#form.field(
+                      { name: `employees.${index}.lastName` },
+                      (field) => {
+                        return html` <div>
+                          <label>Last Name</label>
+                          <md-filled-text-field
+                            type="text"
+                            placeholder="Last Name"
+                            ${bind(field)}
+                          ></md-filled-text-field>
+                        </div>`;
+                      },
+                    )}
+                    ${this.#form.field(
+                      { name: `employees.${index}.color` },
+                      (field) => {
+                        return html` <div>
+                          <label>Favorite Color</label>
+                          <md-filled-select ${bind(field)}>
+                            <md-select-option value="#FF0000">
+                              <div slot="headline">Red</div>
+                            </md-select-option>
+                            <md-select-option value="#00FF00">
+                              <div slot="headline">Green</div>
+                            </md-select-option>
+                            <md-select-option value="#0000FF">
+                              <div slot="headline">Blue</div>
+                            </md-select-option>
+                          </md-filled-select>
+                        </div>`;
+                      },
+                    )}
+                    ${this.#form.field(
+                      { name: `employees.${index}.employed` },
+                      (field) => {
+                        return html`<div>
+                            <label>Employed?</label>
+                            <md-checkbox
+                              @input="${() =>
+                                field.handleChange(!field.getValue())}"
+                              .checked="${field.getValue()}"
+                              @blur="${() => field.handleBlur()}"
+                              .type=${"checkbox"}
+                            ></md-checkbox>
+                          </div>
+                          ${field.getValue()
+                            ? this.#form.field(
+                                {
+                                  name: `employees.${index}.jobTitle`,
+                                  validators: {
+                                    onChange: (state: FieldState<string>) => {
+                                      return state.value.length === 0
+                                        ? "Needs to have a job here"
+                                        : null;
+                                    },
                                   },
                                 },
-                              },
-                              (field) => {
-                                return html` <div>
-                                  <label>Job Title</label>
-                                  <md-filled-text-field
-                                    type="text"
-                                    placeholder="Job Title"
-                                    ${bind(field)}
-                                  ></md-filled-text-field>
-                                </div>`;
-                              },
-                            )
-                          : ""} `;
-                    },
-                  )}
-                `;
-              },
-            )}
+                                (field) => {
+                                  return html` <div>
+                                    <label>Job Title</label>
+                                    <md-filled-text-field
+                                      type="text"
+                                      placeholder="Job Title"
+                                      ${bind(field)}
+                                    ></md-filled-text-field>
+                                  </div>`;
+                                },
+                              )
+                            : ""} `;
+                      },
+                    )}
+                  `;
+                },
+              )}
 
-            <div>
-              <md-outlined-button
-                type="button"
-                @click=${() => {
-                  field.pushValue({
-                    firstName: "",
-                    lastName: "",
-                    employed: false,
-                  });
-                }}
-              >
-                Add employee
-              </md-outlined-button>
-            </div> `;
-        })}
+              <div>
+                <md-outlined-button
+                  type="button"
+                  @click=${() => {
+                    field.pushValue({
+                      firstName: "",
+                      lastName: "",
+                      employed: false,
+                    });
+                  }}
+                >
+                  Add employee
+                </md-outlined-button>
+              </div> `;
+          },
+        )}
 
         <div>
           <md-filled-button
