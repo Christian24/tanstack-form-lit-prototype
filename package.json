@@ -21,7 +21,6 @@
     "@wdio/cli": "^8.28.6",
     "@wdio/mocha-framework": "^8.28.6",
     "@wdio/spec-reporter": "^8.28.6",
-    "@web/test-runner": "^0.18.0",
     "@web/test-runner-puppeteer": "^0.15.0",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.2",
