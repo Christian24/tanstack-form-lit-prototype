@@ -1,7 +1,7 @@
 import { FormOptions } from "@tanstack/form-core";
 import { html, LitElement } from "lit";
-import { TanstackFormController } from "../src/tanstack-form-controller";
-import { bind } from "../src/bind";
+import { TanstackFormController } from "../src/tanstack-form-controller.ts";
+import { bind } from "../src/bind.ts";
 import { customElement } from "lit/decorators.js";
 import "@material/web/textfield/filled-text-field.js";
 import "@material/web/checkbox/checkbox.js";

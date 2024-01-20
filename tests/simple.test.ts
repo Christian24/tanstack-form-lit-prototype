@@ -1,6 +1,6 @@
-import "../tests-setup/simple.js";
+import "./simple";
 
-import { sampleData, TestForm } from "../tests-setup/simple";
+import { sampleData, TestForm } from "./simple";
 
 import { expect, $ } from "@wdio/globals";
 describe("Lit Tests", () => {
@@ -42,7 +42,6 @@ describe("Lit Tests", () => {
     const form = element.form;
     await $("test-form").shadow$("#reset").click();
     expect(form.state.values.firstName).toHaveText(sampleData.firstName);
-    // expect(form.api.getFieldMeta("firstName").isTouched).toBeFalsy();
   });
 
   it("should display validation", async () => {
