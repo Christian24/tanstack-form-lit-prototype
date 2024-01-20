@@ -62,6 +62,7 @@ export class TanstackFormController<
   }
 
   hostConnected() {
+    this.state = this.api.store.state;
     this.#subscription = this.api.store.subscribe(() => {
       this.#host.requestUpdate();
       this.state = this.api.store.state;

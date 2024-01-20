@@ -19,16 +19,19 @@ interface Employee {
   jobTitle: string;
 }
 
-const formConfig: FormOptions<Partial<Employee>, any> = {
+export const sampleData: Partial<Employee> = { firstName: "Christian" };
+
+const formConfig: FormOptions<Partial<Employee>> = {
   onSubmit: async (values) => {
     await new Promise((r) => setTimeout(r, 500));
     window.alert(JSON.stringify(values, null, 2));
   },
+  defaultValues: sampleData,
 };
 
 @customElement("test-form")
 export class TestForm extends LitElement {
-  #form = new TanstackFormController(this, formConfig);
+  form = new TanstackFormController(this, formConfig);
 
   render() {
     return html`
@@ -40,7 +43,7 @@ export class TestForm extends LitElement {
       >
         <h1>Tanstack Form - Lit Demo</h1>
 
-        ${this.#form.field(
+        ${this.form.field(
           {
             name: `firstName`,
             validators: {
@@ -52,6 +55,7 @@ export class TestForm extends LitElement {
             return html` <div>
               <label>First Name</label>
               <md-filled-text-field
+                id="firstName"
                 type="text"
                 placeholder="First Name"
                 ${bind(field)}
@@ -59,20 +63,30 @@ export class TestForm extends LitElement {
             </div>`;
           },
         )}
-        ${this.#form.field({ name: `lastName` }, (field) => {
-          return html` <div>
-            <label>Last Name</label>
-            <md-filled-text-field
-              type="text"
-              placeholder="Last Name"
-              ${bind(field)}
-            ></md-filled-text-field>
-          </div>`;
-        })}
-        ${this.#form.field({ name: `color` }, (field) => {
+        ${this.form.field(
+          {
+            name: `lastName`,
+            validators: {
+              onChange: (name: string) =>
+                name.length < 3 ? "Not long enough" : undefined,
+            },
+          },
+          (field) => {
+            return html` <div>
+              <label>Last Name</label>
+              <md-filled-text-field
+                id="lastName"
+                type="text"
+                placeholder="Last Name"
+                ${bind(field)}
+              ></md-filled-text-field>
+            </div>`;
+          },
+        )}
+        ${this.form.field({ name: `color` }, (field) => {
           return html` <div>
             <label>Favorite Color</label>
-            <md-filled-select ${bind(field)}>
+            <md-filled-select ${bind(field)} id="color">
               <md-select-option value="#FF0000">
                 <div slot="headline">Red</div>
               </md-select-option>
@@ -85,7 +99,7 @@ export class TestForm extends LitElement {
             </md-filled-select>
           </div>`;
         })}
-        ${this.#form.field({ name: `employed` }, (field) => {
+        ${this.form.field({ name: `employed` }, (field) => {
           return html`
             <div>
               <label>Employed?</label>
@@ -93,11 +107,12 @@ export class TestForm extends LitElement {
                 @input="${() => field.handleChange(!field.getValue())}"
                 .checked="${field.getValue()}"
                 @blur="${() => field.handleBlur()}"
+                id="employed"
                 .type=${"checkbox"}
               ></md-checkbox>
             </div>
             ${field.getValue()
-              ? this.#form.field(
+              ? this.form.field(
                   {
                     name: `jobTitle`,
                     validators: {
@@ -110,6 +125,7 @@ export class TestForm extends LitElement {
                       <label>Job Title</label>
                       <md-filled-text-field
                         type="text"
+                        id="jobTitle"
                         placeholder="Job Title"
                         ${bind(field)}
                       ></md-filled-text-field>
@@ -126,9 +142,9 @@ export class TestForm extends LitElement {
         <div>
           <md-filled-button
             type="submit"
-            ?disabled=${this.#form.api.state.isSubmitting}
+            ?disabled=${this.form.api.state.isSubmitting}
             >${
-              this.#form.api.state.isSubmitting
+              this.form.api.state.isSubmitting
                 ? html` <md-circular-progress
                     indeterminate
                     style="--md-circular-progress-size: 30px;"
@@ -140,14 +156,14 @@ export class TestForm extends LitElement {
             type="button"
             id="reset"
             @click=${() => {
-              this.#form.api.reset();
+              this.form.api.reset();
             }}
           >
             Reset
           </md-outlined-button>
         </div>
       </form>
-      <pre>${JSON.stringify(this.#form.state, null, 2)}</pre>
+      <pre>${JSON.stringify(this.form.state, null, 2)}</pre>
     `;
   }
 }

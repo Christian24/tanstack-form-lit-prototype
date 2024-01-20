@@ -6,17 +6,41 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "wdio": "wdio run ./wdio.conf.ts"
   },
   "dependencies": {
     "@material/web": "^1.0.0",
     "@tanstack/form-core": "^0.13.3",
-    "lit": "^3.0.0"
+    "@web/dev-server-esbuild": "^1.0.1"
   },
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@open-wc/testing": "^4.0.0",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/webdriverio": "^3.2.1",
+    "@types/chai": "^4.3.11",
     "@types/node": "^20.9.0",
+    "@vitest/browser": "^1.2.1",
+    "@vitest/utils": "^1.2.1",
+    "@wdio/browser-runner": "^8.28.7",
+    "@wdio/cli": "^8.28.6",
+    "@wdio/mocha-framework": "^8.28.6",
+    "@wdio/spec-reporter": "^8.28.6",
+    "@web/test-runner": "^0.18.0",
+    "@web/test-runner-puppeteer": "^0.15.0",
+    "chai": "^5.0.0",
+    "happy-dom": "^13.2.0",
+    "jsdom": "^23.2.0",
+    "lit": "^3.1.1",
     "prettier": "^3.0.3",
+    "shadow-dom-testing-library": "^1.11.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
-    "vite": "^4.4.9"
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1",
+    "wdio-vite-service": "^1.0.6",
+    "wdio-wait-for": "^3.0.10"
   }
 }
