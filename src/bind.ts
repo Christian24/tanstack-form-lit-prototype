@@ -2,7 +2,7 @@ import { ElementPart, PartInfo, PartType, directive } from "lit/directive.js";
 import { FieldApi } from "@tanstack/form-core";
 import {
   ControlValueAccessor,
-  getMWCAccessor,
+  getNativeAccessor,
 } from "./control-value-accessor.js";
 import { noChange, nothing } from "lit";
 import { AsyncDirective } from "lit/async-directive.js";
@@ -39,7 +39,7 @@ class BindDirective extends AsyncDirective {
     this.#field = fieldConfig;
     if (!this.#registered) {
       if (accessorFn === undefined) {
-        accessorFn = getMWCAccessor;
+        accessorFn = getNativeAccessor;
       }
       this.#accessor = accessorFn(this.#element);
 
@@ -84,7 +84,7 @@ class BindDirective extends AsyncDirective {
 
   // Can't get generics carried over from directive call
   // @ts-ignore
-  render(field: FieldApi<any, any, any, any>, accessorFn = getMWCAccessor) {
+  render(field: FieldApi<any, any, any, any>, accessorFn = getNativeAccessor) {
     return nothing;
   }
 

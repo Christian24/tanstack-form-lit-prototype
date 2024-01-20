@@ -3,14 +3,6 @@ import { customElement } from "lit/decorators.js";
 
 import { styles } from "./styles.js";
 import { TanstackFormController } from "./tanstack-form-controller.js";
-
-import "@material/web/textfield/filled-text-field.js";
-import "@material/web/checkbox/checkbox.js";
-import "@material/web/select/filled-select.js";
-import "@material/web/select/select-option.js";
-import "@material/web/button/filled-button.js";
-import "@material/web/button/outlined-button.js";
-import "@material/web/progress/circular-progress.js";
 import { FieldState, FormOptions } from "@tanstack/form-core";
 import { bind } from "./bind.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -74,11 +66,11 @@ export class TanstackFormDemo extends LitElement {
                       (field) => {
                         return html` <div>
                           <label>First Name</label>
-                          <md-filled-text-field
+                          <input
                             type="text"
                             placeholder="First Name"
                             ${bind(field)}
-                          ></md-filled-text-field>
+                          />
                         </div>`;
                       },
                     )}
@@ -87,11 +79,11 @@ export class TanstackFormDemo extends LitElement {
                       (field) => {
                         return html` <div>
                           <label>Last Name</label>
-                          <md-filled-text-field
+                          <input
                             type="text"
                             placeholder="Last Name"
                             ${bind(field)}
-                          ></md-filled-text-field>
+                          />
                         </div>`;
                       },
                     )}
@@ -100,17 +92,11 @@ export class TanstackFormDemo extends LitElement {
                       (field) => {
                         return html` <div>
                           <label>Favorite Color</label>
-                          <md-filled-select ${bind(field)}>
-                            <md-select-option value="#FF0000">
-                              <div slot="headline">Red</div>
-                            </md-select-option>
-                            <md-select-option value="#00FF00">
-                              <div slot="headline">Green</div>
-                            </md-select-option>
-                            <md-select-option value="#0000FF">
-                              <div slot="headline">Blue</div>
-                            </md-select-option>
-                          </md-filled-select>
+                          <select ${bind(field)}>
+                            <option value="#FF0000">Red</option>
+                            <option value="#00FF00">Green</option>
+                            <option value="#0000FF">Blue</option>
+                          </select>
                         </div>`;
                       },
                     )}
@@ -119,13 +105,13 @@ export class TanstackFormDemo extends LitElement {
                       (field) => {
                         return html`<div>
                             <label>Employed?</label>
-                            <md-checkbox
+                            <input
+                              type="checkbox"
                               @input="${() =>
                                 field.handleChange(!field.getValue())}"
                               .checked="${field.getValue()}"
                               @blur="${() => field.handleBlur()}"
-                              .type=${"checkbox"}
-                            ></md-checkbox>
+                            />
                           </div>
                           ${field.getValue()
                             ? this.#form.field(
@@ -142,11 +128,11 @@ export class TanstackFormDemo extends LitElement {
                                 (field) => {
                                   return html` <div>
                                     <label>Job Title</label>
-                                    <md-filled-text-field
+                                    <input
                                       type="text"
                                       placeholder="Job Title"
                                       ${bind(field)}
-                                    ></md-filled-text-field>
+                                    />
                                   </div>`;
                                 },
                               )
@@ -158,7 +144,7 @@ export class TanstackFormDemo extends LitElement {
               )}
 
               <div>
-                <md-outlined-button
+                <button
                   type="button"
                   @click=${() => {
                     field.pushValue({
@@ -169,23 +155,16 @@ export class TanstackFormDemo extends LitElement {
                   }}
                 >
                   Add employee
-                </md-outlined-button>
+                </button>
               </div> `;
           },
         )}
 
         <div>
-          <md-filled-button
-            type="submit"
-            ?disabled=${this.#form.api.state.isSubmitting}
-            >${this.#form.api.state.isSubmitting
-              ? html` <md-circular-progress
-                  indeterminate
-                  style="--md-circular-progress-size: 30px;"
-                ></md-circular-progress>`
-              : "Submit"}
-          </md-filled-button>
-          <md-outlined-button
+          <button type="submit" ?disabled=${this.#form.api.state.isSubmitting}>
+            ${this.#form.api.state.isSubmitting ? html` Submitting` : "Submit"}
+          </button>
+          <button
             type="button"
             id="reset"
             @click=${() => {
@@ -193,7 +172,7 @@ export class TanstackFormDemo extends LitElement {
             }}
           >
             Reset
-          </md-outlined-button>
+          </button>
         </div>
       </form>
       <pre>${JSON.stringify(this.#form.state, null, 2)}</pre>

@@ -1,15 +1,8 @@
 import { FormOptions } from "@tanstack/form-core";
 import { html, LitElement } from "lit";
-import { TanstackFormController } from "../src/tanstack-form-controller.ts";
-import { bind } from "../src/bind.ts";
+import { TanstackFormController } from "../src/tanstack-form-controller";
+import { bind } from "../src/bind";
 import { customElement } from "lit/decorators.js";
-import "@material/web/textfield/filled-text-field.js";
-import "@material/web/checkbox/checkbox.js";
-import "@material/web/select/filled-select.js";
-import "@material/web/select/select-option.js";
-import "@material/web/button/filled-button.js";
-import "@material/web/button/outlined-button.js";
-import "@material/web/progress/circular-progress.js";
 
 interface Employee {
   firstName: string;
@@ -54,12 +47,12 @@ export class TestForm extends LitElement {
           (field) => {
             return html` <div>
               <label>First Name</label>
-              <md-filled-text-field
+              <input
                 id="firstName"
                 type="text"
                 placeholder="First Name"
                 ${bind(field)}
-              ></md-filled-text-field>
+              />
             </div>`;
           },
         )}
@@ -74,42 +67,36 @@ export class TestForm extends LitElement {
           (field) => {
             return html` <div>
               <label>Last Name</label>
-              <md-filled-text-field
+              <input
                 id="lastName"
                 type="text"
                 placeholder="Last Name"
                 ${bind(field)}
-              ></md-filled-text-field>
+              />
             </div>`;
           },
         )}
         ${this.form.field({ name: `color` }, (field) => {
           return html` <div>
             <label>Favorite Color</label>
-            <md-filled-select ${bind(field)} id="color">
-              <md-select-option value="#FF0000">
-                <div slot="headline">Red</div>
-              </md-select-option>
-              <md-select-option value="#00FF00">
-                <div slot="headline">Green</div>
-              </md-select-option>
-              <md-select-option value="#0000FF">
-                <div slot="headline">Blue</div>
-              </md-select-option>
-            </md-filled-select>
+            <select ${bind(field)}>
+              <option value="#FF0000">Red</option>
+              <option value="#00FF00">Green</option>
+              <option value="#0000FF">Blue</option>
+            </select>
           </div>`;
         })}
         ${this.form.field({ name: `employed` }, (field) => {
           return html`
             <div>
               <label>Employed?</label>
-              <md-checkbox
+              <input
                 @input="${() => field.handleChange(!field.getValue())}"
                 .checked="${field.getValue()}"
                 @blur="${() => field.handleBlur()}"
                 id="employed"
                 .type=${"checkbox"}
-              ></md-checkbox>
+              />
             </div>
             ${field.getValue()
               ? this.form.field(
@@ -123,12 +110,12 @@ export class TestForm extends LitElement {
                   (field) => {
                     return html` <div>
                       <label>Job Title</label>
-                      <md-filled-text-field
+                      <input
                         type="text"
                         id="jobTitle"
                         placeholder="Job Title"
                         ${bind(field)}
-                      ></md-filled-text-field>
+                      />
                     </div>`;
                   },
                 )
@@ -140,19 +127,12 @@ export class TestForm extends LitElement {
         
 
         <div>
-          <md-filled-button
+          <button
             type="submit"
             ?disabled=${this.form.api.state.isSubmitting}
-            >${
-              this.form.api.state.isSubmitting
-                ? html` <md-circular-progress
-                    indeterminate
-                    style="--md-circular-progress-size: 30px;"
-                  ></md-circular-progress>`
-                : "Submit"
-            }
-          </md-filled-button>
-          <md-outlined-button
+            >${this.form.api.state.isSubmitting ? html` Submitting` : "Submit"}
+          </button>
+          <button
             type="button"
             id="reset"
             @click=${() => {
@@ -160,7 +140,7 @@ export class TestForm extends LitElement {
             }}
           >
             Reset
-          </md-outlined-button>
+          </button>
         </div>
       </form>
       <pre>${JSON.stringify(this.form.state, null, 2)}</pre>

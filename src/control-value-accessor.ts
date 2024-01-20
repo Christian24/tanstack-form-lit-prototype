@@ -1,11 +1,3 @@
-import {
-  MdCheckbox,
-  MdFilledSelect,
-  MdFilledTextField,
-  MdOutlinedSelect,
-  MdOutlinedTextField,
-} from "@material/web/all";
-
 export interface ControlValueAccessor<T extends HTMLElement, Value> {
   /**
    * Is this the right ControlValueAccessor for this element type?
@@ -19,98 +11,80 @@ export interface ControlValueAccessor<T extends HTMLElement, Value> {
   eventName: string;
 }
 
-const checkboxValueAccessor: ControlValueAccessor<MdCheckbox, boolean> = {
+const checkboxValueAccessor: ControlValueAccessor<HTMLInputElement, boolean> = {
   conforms(element: HTMLElement): boolean {
-    return element.tagName.toLowerCase() === "md-checkbox";
+    return (
+      element.tagName.toLowerCase() === "input" &&
+      element.getAttribute("type") === "checkbox"
+    );
   },
-  setValue(element: MdCheckbox, value: boolean) {
+  setValue(element: HTMLInputElement, value: boolean) {
     element.checked = value;
   },
-  getValue(element: MdCheckbox): boolean {
+  getValue(element: HTMLInputElement): boolean {
     return element.checked;
   },
 
   eventName: "input",
 };
 
-const textFieldValueAccessor: ControlValueAccessor<
-  MdFilledTextField | MdOutlinedTextField,
-  string
-> = {
+const textFieldValueAccessor: ControlValueAccessor<HTMLInputElement, string> = {
   conforms(element: HTMLElement): boolean {
-    return (
-      element.tagName.toLowerCase().includes("text-field") &&
-      element.tagName.toLowerCase().includes("md")
-    );
+    return element.tagName.toLowerCase().includes("input");
   },
-  getValue(element: MdFilledTextField | MdOutlinedTextField): string {
+  getValue(element: HTMLInputElement): string {
     return element.value;
   },
-  setValue(element: MdFilledTextField | MdOutlinedTextField, value: string) {
+  setValue(element: HTMLInputElement, value: string) {
     element.value = value;
   },
-  setCustomValidity(
-    element: MdFilledTextField | MdOutlinedTextField,
-    messages?: string[],
-  ) {
+  setCustomValidity(element: HTMLInputElement, messages?: string[]) {
     if (messages === undefined || messages.length === 0) {
-      element.error = false;
-      element.errorText = "";
+      element.setCustomValidity("");
+      element.reportValidity();
     }
     const message = getFirstErrorMessage(messages!);
     if (message) {
-      element.errorText = message;
-      element.error = message.length > 0;
+      element.setCustomValidity(message);
+      element.reportValidity();
     }
   },
   eventName: "input",
 };
-const selectValueAccessor: ControlValueAccessor<
-  MdFilledSelect | MdOutlinedSelect,
-  string
-> = {
+const selectValueAccessor: ControlValueAccessor<HTMLSelectElement, string> = {
   conforms(element: HTMLElement): boolean {
-    return (
-      element.tagName.toLowerCase().includes("select") &&
-      element.tagName.toLowerCase().includes("md")
-    );
+    return element.tagName.toLowerCase().includes("select");
   },
-  setValue(element: MdFilledSelect | MdOutlinedSelect, value: string) {
-    if (value === "") {
-      element.reset();
-    }
+  setValue(element: HTMLSelectElement, value: string) {
     element.value = value;
   },
-  getValue(element: MdFilledSelect | MdOutlinedSelect): string {
+  getValue(element: HTMLSelectElement): string {
     return element.value;
   },
-  setCustomValidity(
-    element: MdFilledSelect | MdOutlinedSelect,
-    messages: string[],
-  ) {
+  setCustomValidity(element: HTMLSelectElement, messages: string[]) {
     if (messages === undefined || messages.length === 0) {
-      element.error = false;
-      element.errorText = "";
+      element.setCustomValidity("");
+      element.reportValidity();
     }
     const message = getFirstErrorMessage(messages);
     if (message) {
-      element.errorText = message;
-      element.error = message.length > 0;
+      element.setCustomValidity(message);
+      element.reportValidity();
     }
   },
   eventName: "input",
 };
 
-export function getMWCAccessor<T extends HTMLElement, Value = any>(
+export function getNativeAccessor<T extends HTMLElement, Value = any>(
   element: T,
-): ControlValueAccessor<T, Value> {
+): ControlValueAccessor<T, Value> | undefined {
   if (selectValueAccessor.conforms(element)) {
     return selectValueAccessor as any;
   } else if (checkboxValueAccessor.conforms(element)) {
     return checkboxValueAccessor as any;
+  } else if (textFieldValueAccessor.conforms(element)) {
+    return textFieldValueAccessor as any;
   }
-
-  return textFieldValueAccessor as any;
 }
 
 function getFirstErrorMessage(messages: string[]) {
